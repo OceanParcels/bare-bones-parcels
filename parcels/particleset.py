@@ -9,15 +9,18 @@ import time
 
 
 class ParticleSet(object):
-    def __init__(self):
+    def __init__(self, lons, lats):
         comm = MPI.COMM_WORLD
         rank = comm.Get_rank()
         size = comm.Get_size()
+        
+        particles_per_processor = len(lons) // size
+        remainder = len(lons) % size
 
-        if rank == 0:
-            self.size = 2
+        if rank < remainder:
+            self.size = particles_per_processor + 1
         else:
-            self.size = 1
+            self.size = particles_per_processor
         self.particles = np.empty(self.size, dtype=JITParticle)
         self.ptype = JITParticle.getPType()
         dtype = self.ptype.dtype
@@ -25,12 +28,17 @@ class ParticleSet(object):
 
         def cptr(i):
             return self._particle_data[i]
+        
+        first_particle = rank * particles_per_processor + remainder
+        if rank < remainder:
+            first_particle -= remainder - rank
+        
+        last_particle = (rank + 1) * particles_per_processor + remainder
+        if rank + 1 < remainder:
+            last_particle -= remainder - rank + 1
 
-        if rank == 0:
-            self.particles[0] = JITParticle(1, 2, 0,cptr=cptr(0))
-            self.particles[1] = JITParticle(4, 3, 0, cptr=cptr(1))
-        else : 
-            self.particles[0] = JITParticle(8, 4, 0, cptr=cptr(0))
+        for i in range(first_particle, last_particle):
+            self.particles[i - first_particle] = JITParticle(lons[i], lats[i], 0, cptr=cptr(i - first_particle))
 
     def add(self, particles):
         """Method to add particles to the ParticleSet"""
@@ -90,7 +98,7 @@ class ParticleSet(object):
         self.size = len(self.particles)
                 
 
-pset = ParticleSet()
+pset = ParticleSet([1, 4, 8], [2, 3, 4])
 
 src_file = 'c_code.c'
 lib_file = 'c_code.so'
