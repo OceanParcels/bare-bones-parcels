@@ -95,7 +95,7 @@ class ParticleSet(object):
             req2.Cancel()
         else:
             p = p2[1]
-            for padd in p
+            for padd in p:
                 padd.CGridIndexSetptr = cast(pointer(padd.gridIndexSet.ctypes_struct), c_void_p)
                 padd.CGridIndexSet = padd.CGridIndexSetptr.value
                 self.add(padd)
