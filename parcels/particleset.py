@@ -192,7 +192,7 @@ def determine_partition(pset, subset_size):
     
     prem = pset.remove(indices)
     
-    for i in range(prem):
+    for i in range(len(prem)):
         prem[i].CGridIndexSetptr = 0
         to_send[procs[i]].append(prem[i])
     
