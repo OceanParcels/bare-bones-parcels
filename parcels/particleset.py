@@ -1,3 +1,4 @@
+from __future__ import division # fixes division issue in Python 2
 import numpy as np
 import compiler
 from ctypes import Structure, c_int, byref, POINTER, pointer, c_void_p, cast
@@ -5,7 +6,6 @@ from particle import JITParticle
 from codegenerator import code_generate
 from collections import Iterable
 from mpi4py import MPI
-from __future__ import division
 import time
 import random
 import math
