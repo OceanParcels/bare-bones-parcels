@@ -84,8 +84,8 @@ class ParticleSet(object):
                 toRem.append(i)
         if len(toRem) > 0:
             prem = self.remove(toRem)
-            prem = prem[0]
-            prem.CGridIndexSetptr = 0
+            for p in prem:
+                p.CGridIndexSetptr = 0
             comm.isend(prem, (rank+1)%2, 17)
             print 'p sent'
         req2 = comm.irecv(source=(rank+1)%2, tag=17)
@@ -95,9 +95,10 @@ class ParticleSet(object):
             req2.Cancel()
         else:
             p = p2[1]
-            p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
-            p.CGridIndexSet = p.CGridIndexSetptr.value
-            self.add(p)
+            for padd in p
+                padd.CGridIndexSetptr = cast(pointer(padd.gridIndexSet.ctypes_struct), c_void_p)
+                padd.CGridIndexSet = padd.CGridIndexSetptr.value
+                self.add(padd)
         self.size = len(self.particles)
 
 
