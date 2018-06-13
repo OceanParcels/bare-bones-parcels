@@ -134,10 +134,8 @@ def determine_partition(pset, subset_size):
         for i in range(1, size):
             messages.append(reqs[i - 1].wait())
         
-        print(str(messages))
-        
         for i in range(size - 1):
-            sample += messages[i][1]
+            sample += messages[i][0]
         
         print(str(sample))
         
