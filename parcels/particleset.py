@@ -129,7 +129,7 @@ def determine_partition(pset, subset_size):
             messages[i] = comm.irecv(source=i)
             print("Waiting for: " + str(i))
         
-        Waitall(messages, MPI.Status())
+        MPI.Request.Waitall(messages, MPI.Status())
         
         print(str(messages))
         
