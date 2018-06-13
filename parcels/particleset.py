@@ -120,7 +120,6 @@ def determine_partition(pset, subset_size):
         for i in subset:
             psend.append([i, pset.particles[i].xi, pset.particles[i].yi])
         comm.isend(psend, 0)
-        print(str(rank) + " sent:" + str(psend))
     if rank == 0:
         sample = []
         
@@ -139,7 +138,6 @@ def determine_partition(pset, subset_size):
         reqs = []
         for i in range(1, size):
             reqs.append(comm.irecv(source=i))
-            print("Waiting for: " + str(i))
         
         for i in range(1, size):
             messages.append(reqs[i - 1].wait())
@@ -147,14 +145,12 @@ def determine_partition(pset, subset_size):
         for i in range(size - 1):
             sample += messages[i]
         
-        print(str(sample))
-        
         # Assign all particles a unique id
         for i in range(len(sample)):
             sample[i][0] = i
         
         # Start recursive paritioning
-        partition = recursive_partition(size, sample, sample, 'x')
+        partition = recursive_partition(range(size), sample, sample, 'x')
             # Say, we have $p$ processors, so we want to end up with $p$ partitions.
             # Our first cut will result in floor(p/2)/p particles to be on one side, and ceil(p/2)/p particles on the other. Recurse with p1 = floor(p/2) and p2 = ceil(p/1) until px = 1.
             # The cut is defined as \leq, so if dir = x and cut = 4, to the left are all particles with x <= 4.
@@ -165,24 +161,24 @@ def determine_partition(pset, subset_size):
     if rank != 0:
         # Recieve cut-information
         partition = comm.recv(source=0)
-        
-        print("Received:" + str(partition))
-        
+        print(partition)
     # Send particles to other processors
+    for i in range(pset.particles):
+        return
     # Receive particles from other processors
     
     
-def recursive_partition(no_proc, dict, sub, dir):
+def recursive_partition(proc, dict, sub, dir):
     # If the sample is smaller than the number of processors, this has strange results (it will try to partition a single particle)
     # Base case
-    if no_proc == 1:
-        return {"dir": 'l', "cut": -1, "left": [], "right": [], "sub": sub}
+    if len(proc) == 1:
+        return {"dir": 'l', "cut": -1, "left": [], "right": [], "proc": proc, "sub": sub}
 
     new_dir = 'x'
     cut = -1
-    no_proc_l = int(math.ceil(no_proc / 2))
-    no_proc_r = int(math.floor(no_proc / 2))
-    no_part_l = int(math.ceil(no_proc_l / no_proc * len(sub)))
+    proc_l = proc[:int(math.ceil(len(proc) / 2))]
+    proc_r = proc[int(math.ceil(len(proc) / 2)):]
+    no_part_l = int(math.ceil(len(proc_l) / len(proc) * len(sub)))
     
     if dir == 'x':
         new_dir = 'y'
@@ -199,10 +195,10 @@ def recursive_partition(no_proc, dict, sub, dir):
     sub_l = sub[:no_part_l]
     sub_r = sub[no_part_l:]
 
-    left_partition = recursive_partition(no_proc_l, dict, sub_l, new_dir)
-    right_partition = recursive_partition(no_proc_r, dict, sub_r, new_dir)
+    left_partition = recursive_partition(proc_l, dict, sub_l, new_dir)
+    right_partition = recursive_partition(proc_r, dict, sub_r, new_dir)
 
-    return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "sub": sub}
+    return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "proc": proc, "sub": sub}
     
 
 lons = [1, 4, 8]
