@@ -172,7 +172,7 @@ def recursive_partition(no_proc, dict, sub, dir):
     no_proc_r = int(math.floor(no_proc / 2))
     no_part_l = int(math.ceil(no_proc_l / no_proc * len(sub)))
 
-    print("%d / %d * %d = %d" % (no_proc_l, no_proc, len(sub), no_part_l))
+    print("%d / %d * %d = %d / %d" % (no_proc_l, no_proc, len(sub), math.ceil(no_proc_l / no_proc * len(sub)), no_part_l))
     
     if dir == 'x':
         new_dir = 'y'
