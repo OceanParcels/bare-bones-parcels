@@ -157,7 +157,7 @@ def determine_partition(subset_size):
     def recursive_partition(no_proc, dict, sub, dir):
         # Base case
         if no_proc == 1:
-            return ["dir": 'l', "cut": -1, "left": [], "right": [], "sub": sub]
+            return {"dir": 'l', "cut": -1, "left": [], "right": [], "sub": sub}
         
         new_dir = 'x'
         cut = -1
@@ -183,7 +183,7 @@ def determine_partition(subset_size):
         left_partition = recursive_partition(no_proc_l, dict, sub_l, new_dir)
         right_partition = recursive_partition(no_proc_r, dict, sub_r, new_dir)
         
-        return ["dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "sub": sub]
+        return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "sub": sub}
     
 
 lons = [1, 4, 8]
