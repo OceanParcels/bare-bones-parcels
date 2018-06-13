@@ -166,7 +166,7 @@ def determine_partition(pset, subset_size):
         # Recieve cut-information
         partition = comm.recv(source=0)
         
-        print("Received:" + partition)
+        print("Received:" + str(partition))
         
     # Send particles to other processors
     # Receive particles from other processors
