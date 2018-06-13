@@ -267,9 +267,9 @@ subset_size = 1 # placeholder value
 for iter in range(17):
     #if rank == 0:
     if iter % 5 == 0:
-        print("Before (" + rank + "): " + str(pset.particles))
+        print("Before (" + str(rank) + "): " + str(pset.particles))
         determine_partition(pset, subset_size)
-        print("After (" + rank + "): " + str(pset.particles))
+        print("After (" + str(rank) + "): " + str(pset.particles))
     print('ITER %d' % iter)
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
     function(c_int(pset.size), particle_data)
