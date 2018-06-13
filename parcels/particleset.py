@@ -124,13 +124,14 @@ def determine_partition(pset, subset_size):
         
         # Gather samples
         messages = [[] for x in range(size)]
+        req = [[] for x in range(size)]
         for i in range(1, size):
-            messages[i] = comm.irecv(source=i)
+            req[i] = comm.irecv(messages[i], source=i)
             print("Waiting for: " + str(i))
         
         for i in range(1, size):
-            messages[i].Wait()
-            print("Completed waiting for: " + str(i))
+            req[i].Wait()
+            print("Completed waiting for: " + str(i) + ": " + str(messages[i]))
         
         for i in range(1, size):
             sample += messages[i]
