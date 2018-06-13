@@ -160,36 +160,36 @@ def determine_partition(pset, subset_size):
     # Receive particles from other processors
     
     
-    def recursive_partition(no_proc, dict, sub, dir):
-        # Base case
-        if no_proc == 1:
-            return {"dir": 'l', "cut": -1, "left": [], "right": [], "sub": sub}
-        
-        new_dir = 'x'
-        cut = -1
-        no_proc_l = ceil(no_proc / 2)
-        no_proc_r = floor(no_proc / 2)
-        no_part_l = ceil(no_proc_l / no_proc * len(sub))
-        
-        if dir == 'x':
-            new_dir = 'y'
-            # Cut in the x-direction
-            sub.sort(key = lambda x: x[1])
-            cut = sub[no_part_l - 1][1]
-        elif dir == 'y':
-            # Cut in the y-direction
-            sub.sort(key = lambda x: x[2])
-            cut = sub[no_part_l - 1][2]
-        else:
-            raise ValueError('A cut in a unknown dimension was requested during partitioning.')
-        
-        sub_l = sub[:no_part_l]
-        sub_r = sub[no_part_l:]
-        
-        left_partition = recursive_partition(no_proc_l, dict, sub_l, new_dir)
-        right_partition = recursive_partition(no_proc_r, dict, sub_r, new_dir)
-        
-        return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "sub": sub}
+def recursive_partition(no_proc, dict, sub, dir):
+    # Base case
+    if no_proc == 1:
+        return {"dir": 'l', "cut": -1, "left": [], "right": [], "sub": sub}
+
+    new_dir = 'x'
+    cut = -1
+    no_proc_l = ceil(no_proc / 2)
+    no_proc_r = floor(no_proc / 2)
+    no_part_l = ceil(no_proc_l / no_proc * len(sub))
+
+    if dir == 'x':
+        new_dir = 'y'
+        # Cut in the x-direction
+        sub.sort(key = lambda x: x[1])
+        cut = sub[no_part_l - 1][1]
+    elif dir == 'y':
+        # Cut in the y-direction
+        sub.sort(key = lambda x: x[2])
+        cut = sub[no_part_l - 1][2]
+    else:
+        raise ValueError('A cut in a unknown dimension was requested during partitioning.')
+
+    sub_l = sub[:no_part_l]
+    sub_r = sub[no_part_l:]
+
+    left_partition = recursive_partition(no_proc_l, dict, sub_l, new_dir)
+    right_partition = recursive_partition(no_proc_r, dict, sub_r, new_dir)
+
+    return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "sub": sub}
     
 
 lons = [1, 4, 8]
