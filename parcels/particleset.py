@@ -150,7 +150,7 @@ def determine_partition(pset, subset_size):
             sample[i][0] = i
         
         # Start recursive paritioning
-        partition = recursive_partition(range(size), sample, sample, 'x')
+        partition = recursive_partition(range(size), sample, 'x')
             # Say, we have $p$ processors, so we want to end up with $p$ partitions.
             # Our first cut will result in floor(p/2)/p particles to be on one side, and ceil(p/2)/p particles on the other. Recurse with p1 = floor(p/2) and p2 = ceil(p/1) until px = 1.
             # The cut is defined as \leq, so if dir = x and cut = 4, to the left are all particles with x <= 4.
@@ -170,7 +170,6 @@ def determine_partition(pset, subset_size):
         branch = partition
         while branch["dir"] != 'l':
             if branch["dir"] == 'x':
-                print("Length: " + str(len(pset.particles)) + "; array: " + str(pset.particles))
                 if pset.particles[i].xi <= branch["cut"]:
                     branch = branch["left"]
                 else:
@@ -208,11 +207,11 @@ def determine_partition(pset, subset_size):
             pset.add(p)
     pset.size = len(pset.particles)
     
-def recursive_partition(proc, dict, sub, dir):
+def recursive_partition(proc, sub, dir):
     # If the sample is smaller than the number of processors, this has strange results (it will try to partition a single particle)
     # Base case
     if len(proc) == 1:
-        return {"dir": 'l', "cut": -1, "left": [], "right": [], "proc": proc, "sub": sub}
+        return {"dir": 'l', "cut": -1, "left": [], "right": [], "proc": proc}
 
     new_dir = 'x'
     cut = -1
@@ -235,14 +234,14 @@ def recursive_partition(proc, dict, sub, dir):
     sub_l = sub[:no_part_l]
     sub_r = sub[no_part_l:]
 
-    left_partition = recursive_partition(proc_l, dict, sub_l, new_dir)
-    right_partition = recursive_partition(proc_r, dict, sub_r, new_dir)
+    left_partition = recursive_partition(proc_l, sub_l, new_dir)
+    right_partition = recursive_partition(proc_r, sub_r, new_dir)
 
-    return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "proc": proc, "sub": sub}
+    return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "proc": proc}
     
 
-lons = [1, 4, 8]
-lats = [2, 3, 4]
+lons = [1, 3, 4, 8, 10]
+lats = [2, 3, 4, 5, 6]
 
 pset = ParticleSet(lons, lats)
 
@@ -272,9 +271,7 @@ subset_size = 1 # placeholder value
 for iter in range(17):
     #if rank == 0:
     if iter % 5 == 0:
-        print("Before (" + str(rank) + "): " + str(pset.particles))
         determine_partition(pset, subset_size)
-        print("After (" + str(rank) + "): " + str(pset.particles))
     print('ITER %d' % iter)
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
     function(c_int(pset.size), particle_data)
