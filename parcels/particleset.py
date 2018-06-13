@@ -5,6 +5,7 @@ from particle import JITParticle
 from codegenerator import code_generate
 from collections import Iterable
 from mpi4py import MPI
+from __future__ import division
 import time
 import random
 import math
@@ -170,7 +171,7 @@ def recursive_partition(no_proc, dict, sub, dir):
     cut = -1
     no_proc_l = int(math.ceil(no_proc / 2))
     no_proc_r = int(math.floor(no_proc / 2))
-    no_part_l = int(math.ceil((no_proc_l / no_proc) * len(sub)))
+    no_part_l = int(math.ceil(no_proc_l / no_proc * len(sub)))
 
     print("%d / %d * %d = %d / %d" % (no_proc_l, no_proc, len(sub), math.ceil(no_proc_l / no_proc * len(sub)), no_part_l))
     
