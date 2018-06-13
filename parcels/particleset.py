@@ -164,6 +164,7 @@ def determine_partition(pset, subset_size):
 
     # Send particles to other processors
     to_send = [[] for x in range(size)]
+    indices = []
 
     for i in range(len(pset.particles)):
         branch = partition
@@ -182,9 +183,12 @@ def determine_partition(pset, subset_size):
             else:
                 raise ValueError('Unknown cut direction encountered')
         if branch["proc"][0] != rank:
-            prem = pset.remove(i)
-            prem.CGridIndexSetptr = 0
-            to_send[branch["proc"][0]].append(prem)
+            indices.append(i)
+    
+    for i in range(len(indices)):
+        prem = pset.remove(i)
+        prem.CGridIndexSetptr = 0
+        to_send[branch["proc"][0]].append(prem)
     
     for i in range(size):
         if i != rank:
