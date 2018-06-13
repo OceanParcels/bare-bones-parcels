@@ -99,7 +99,7 @@ class ParticleSet(object):
         self.size = len(self.particles)
 
 
-def determine_partition(subset_size):
+def determine_partition(pset, subset_size):
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
@@ -107,19 +107,19 @@ def determine_partition(subset_size):
     
     if rank != 0:
         # Sample
-        subset = random.sample(range(len(self.particles), subset_size))
+        subset = random.sample(range(len(pset.particles), subset_size))
         # Send sample to processor 0
         psend = []
         for i in subset:
-            psend.append([i, self.particles[i].xi, self.particles[i].yi])
+            psend.append([i, pset.particles[i].xi, pset.particles[i].yi])
         comm.isend(psend, 0)
     if rank == 0:
         sample = []
         
         # Determine own sample
-        subset = random.sample(range(len(self.particles), subset_size))
+        subset = random.sample(range(len(pset.particles), subset_size))
         for i in subset:
-            sample.append([i, self.particles[i].xi, self.particles[i].yi])
+            sample.append([i, pset.particles[i].xi, pset.particles[i].yi])
         
         # Gather samples
         messages = [[] for x in size]
@@ -212,7 +212,7 @@ function = lib.mainFunc
 
 # Initial particle distribution
 subset_size = 1 # placeholder value
-determine_partition(subset_size)
+determine_partition(pset, subset_size)
 
 for iter in range(17):
     #if rank == 0:
