@@ -161,12 +161,43 @@ def determine_partition(pset, subset_size):
     if rank != 0:
         # Recieve cut-information
         partition = comm.recv(source=0)
-        print(partition)
+
     # Send particles to other processors
+    to_send = [[] for x in range(size)]
+
     for i in range(len(pset.particles)):
-        return
-    # Receive particles from other processors
+        branch = partition
+        while branch["dir"] != 'l':
+            if branch["dir"] == 'x':
+                if pset.particles[i].xi <= branch["cut"]:
+                    branch = branch["left"]
+                else:
+                    branch = branch["right"]
+            elif branch["dir"] == 'y':
+                if pset.particles[i].yi <= branch["cut"]:
+                    branch = branch["left"]
+                else:
+                    branch = branch["right"]
+            else:
+                raise ValueError('Unknown cut direction encoutered')
+        to_send[branch["proc"][0]].append(pset.particles[i])
     
+    for i in range(size):
+        if i != rank:
+            comm.isend(to_send[i], i)
+            for p in to_send:
+                pset.remove(p)
+
+    # Receive particles from other processors
+    reqs = []
+    for i in range(size):
+        if i != rank:
+            reqs.append(comm.irecv(source=i))
+    
+    for i in range(size - 1):
+        res = reqs[i].wait()
+        for p in res:
+            pset.add(p)
     
 def recursive_partition(proc, dict, sub, dir):
     # If the sample is smaller than the number of processors, this has strange results (it will try to partition a single particle)
@@ -227,12 +258,14 @@ function = lib.mainFunc
 
 # Initial particle distribution
 subset_size = 1 # placeholder value
-determine_partition(pset, subset_size)
+#determine_partition(pset, subset_size)
 
 for iter in range(17):
     #if rank == 0:
     if iter % 5 == 0:
+        print("Before: " + str(pset.particles))
         determine_partition(pset, subset_size)
+        print("After: " + str(pset.particles))
     print('ITER %d' % iter)
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
     function(c_int(pset.size), particle_data)
