@@ -184,7 +184,7 @@ def determine_partition(pset, subset_size):
         if branch["proc"][0] != rank:
             indices.append(i)
     
-    for i in range(len(indices)):
+    for i in indices:
         prem = pset.remove(i)
         prem.CGridIndexSetptr = 0
         to_send[branch["proc"][0]].append(prem)
