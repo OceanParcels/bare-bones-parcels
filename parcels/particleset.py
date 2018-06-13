@@ -181,7 +181,7 @@ def determine_partition(pset, subset_size):
             else:
                 raise ValueError('Unknown cut direction encountered')
         if branch["proc"][0] != rank:
-            prem = pset.remove(pset.particles[i])
+            prem = pset.remove(i)
             prem = prem[0]
             prem.CGridIndexSetptr = 0
             to_send[branch["proc"][0]].append(prem)
