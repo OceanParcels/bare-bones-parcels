@@ -240,8 +240,8 @@ def recursive_partition(proc, sub, dir):
     return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "proc": proc}
     
 
-lons = [1, 3, 4, 8, 10]
-lats = [2, 3, 4, 5, 6]
+lons = [1, 4, 8]
+lats = [2, 3, 4]
 
 pset = ParticleSet(lons, lats)
 
