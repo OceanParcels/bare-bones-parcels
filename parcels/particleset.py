@@ -169,6 +169,7 @@ def determine_partition(pset, subset_size):
         branch = partition
         while branch["dir"] != 'l':
             if branch["dir"] == 'x':
+                print("Length: " + str(len(pset.particles)) + "; array: " + str(pset.particles))
                 if pset.particles[i].xi <= branch["cut"]:
                     branch = branch["left"]
                 else:
