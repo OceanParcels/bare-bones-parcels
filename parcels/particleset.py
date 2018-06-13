@@ -132,7 +132,7 @@ def determine_partition(subset_size):
             sample += messages[i]
         
         # Assign all particles a unique id
-        for i in range(len(sample))
+        for i in range(len(sample)):
             sample[i][0] = i
         
         # Start recursive paritioning
