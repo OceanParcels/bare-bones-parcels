@@ -6,6 +6,7 @@ from codegenerator import code_generate
 from collections import Iterable
 from mpi4py import MPI
 import time
+import random
 
 
 class ParticleSet(object):
@@ -96,9 +97,99 @@ class ParticleSet(object):
             p.CGridIndexSet = p.CGridIndexSetptr.value
             self.add(p)
         self.size = len(self.particles)
-                
 
-pset = ParticleSet([1, 4, 8], [2, 3, 4])
+
+def determine_partition(subset_size):
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+    partition = []
+    
+    if rank != 0:
+        # Sample
+        subset = random.sample(range(len(self.particles), subset_size)
+        # Send sample to processor 0
+        psend = []
+        for i in subset:
+            psend.append([i, self.particles[i].xi, self.particles[i].yi])
+        comm.isend(psend, 0)
+    if rank == 0:
+        sample = []
+        
+        # Determine own sample
+        subset = random.sample(range(len(self.particles), subset_size)
+        for i in subset:
+            sample.append([i, self.particles[i].xi, self.particles[i].yi])
+        
+        # Gather samples
+        messages = [[] for x in size]
+        for i in range(1, size):
+            messages[i] = comm.irecv(source=i)
+        
+        comm.Barrier()
+        
+        for i in range(1, size):
+            sample += messages[i]
+        
+        # Assign all particles a unique id
+        for i in range(len(sample))
+            sample[i][0] = i
+        
+        # Start recursive paritioning
+        partition = recursive_partition(size, sample, sample, 'x')
+            # Say, we have $p$ processors, so we want to end up with $p$ partitions.
+            # Our first cut will result in floor(p/2)/p particles to be on one side, and ceil(p/2)/p particles on the other. Recurse with p1 = floor(p/2) and p2 = ceil(p/1) until px = 1.
+            # The cut is defined as \leq, so if dir = x and cut = 4, to the left are all particles with x <= 4.
+        
+        print(partition)
+        
+        # Communicate cuts
+        for i in range(1, size):
+            comm.isend(partition, i)
+    if rank != 0:
+        # Recieve cut-information
+        partition = comm.Recv(source=0)
+        
+    # Send particles to other processors
+    # Receive particles from other processors
+    
+    
+    def recursive_partition(no_proc, dict, sub, dir):
+        # Base case
+        if no_proc == 1:
+            return ["dir": 'l', "cut": -1, "left": [], "right": [], "sub": sub]
+        
+        new_dir = 'x'
+        cut = -1
+        no_proc_l = ceil(no_proc / 2)
+        no_proc_r = floor(no_proc / 2)
+        no_part_l = ceil(no_proc_l / no_proc * len(sub))
+        
+        if dir == 'x':
+            new_dir = 'y'
+            # Cut in the x-direction
+            sub.sort(key = lambda x: x[1])
+            cut = sub[no_part_l - 1][1]
+        elif dir == 'y':
+            # Cut in the y-direction
+            sub.sort(key = lambda x: x[2])
+            cut = sub[no_part_l - 1][2]
+        else:
+            raise ValueError('A cut in a unknown dimension was requested during partitioning.')
+        
+        sub_l = sub[:no_part_l]
+        sub_r = sub[no_part_l:]
+        
+        left_partition = recursive_partition(no_proc_l, dict, sub_l, new_dir)
+        right_partition = recursive_partition(no_proc_r, dict, sub_r, new_dir)
+        
+        return ["dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "sub": sub]
+    
+
+lons = [1, 4, 8]
+lats = [2, 3, 4]
+
+pset = ParticleSet(lons, lats)
 
 src_file = 'c_code.c'
 lib_file = 'c_code.so'
@@ -119,8 +210,14 @@ lib = npct.load_library(lib_file, '.')
 function = lib.mainFunc
 
 
+# Initial particle distribution
+subset_size = 1 # placeholder value
+determine_partition(subset_size)
+
 for iter in range(17):
     #if rank == 0:
+    if iter % 5 == 0:
+        determine_partition(subset_size)
     print('ITER %d' % iter)
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
     function(c_int(pset.size), particle_data)
