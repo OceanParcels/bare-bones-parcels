@@ -172,6 +172,8 @@ def recursive_partition(no_proc, dict, sub, dir):
     no_proc_r = int(math.floor(no_proc / 2))
     no_part_l = int(math.ceil(no_proc_l / no_proc * len(sub)))
 
+    print("%d / %d * %d = %d" % (no_proc_l, no_proc, len(sub), no_part_l))
+    
     if dir == 'x':
         new_dir = 'y'
         # Cut in the x-direction
@@ -224,7 +226,7 @@ determine_partition(pset, subset_size)
 for iter in range(17):
     #if rank == 0:
     if iter % 5 == 0:
-        determine_partition(subset_size)
+        determine_partition(pset, subset_size)
     print('ITER %d' % iter)
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
     function(c_int(pset.size), particle_data)
