@@ -118,7 +118,7 @@ def determine_partition(pset, subset_size):
         # Send sample to processor 0
         psend = []
         for i in subset:
-            psend.append([i, pset.particles[i].xi, pset.particles[i].yi])
+            psend.append([pset.particles[i].xi, pset.particles[i].yi])
         comm.isend(psend, 0)
     if rank == 0:
         sample = []
@@ -131,7 +131,7 @@ def determine_partition(pset, subset_size):
             subset = range(len(pset.particles))
             
         for i in subset:
-            sample.append([i, pset.particles[i].xi, pset.particles[i].yi])
+            sample.append([pset.particles[i].xi, pset.particles[i].yi])
         
         # Gather samples
         messages = []
@@ -146,10 +146,6 @@ def determine_partition(pset, subset_size):
             sample += messages[i]
         
         print(len(sample))
-        
-        # Assign all particles a unique id -- This is probably not necessary
-        for i in range(len(sample)):
-            sample[i][0] = i
         
         # Start recursive paritioning
         partition = recursive_partition(range(size), sample, 'x')
@@ -229,12 +225,12 @@ def recursive_partition(proc, sub, dir):
     if dir == 'x':
         new_dir = 'y'
         # Cut in the x-direction
-        sub.sort(key = lambda x: x[1])
-        cut = sub[no_part_l - 1][1]
+        sub.sort(key = lambda x: x[0])
+        cut = sub[no_part_l - 1][0]
     elif dir == 'y':
         # Cut in the y-direction
-        sub.sort(key = lambda x: x[2])
-        cut = sub[no_part_l - 1][2]
+        sub.sort(key = lambda x: x[1])
+        cut = sub[no_part_l - 1][1]
     else:
         raise ValueError('A cut in a unknown dimension was requested during partitioning.')
 
