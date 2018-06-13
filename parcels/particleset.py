@@ -145,8 +145,6 @@ def determine_partition(pset, subset_size):
         for i in range(size - 1):
             sample += messages[i]
         
-        print(len(sample))
-        
         # Start recursive paritioning
         partition = recursive_partition(range(size), sample, 'x')
             # Say, we have $p$ processors, so we want to end up with $p$ partitions.
@@ -159,7 +157,6 @@ def determine_partition(pset, subset_size):
     if rank != 0:
         # Recieve cut-information
         partition = comm.recv(source=0)
-        print(partition["cut"])
 
     # Send particles to other processors
     to_send = [[] for x in range(size)]
