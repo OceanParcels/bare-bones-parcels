@@ -122,7 +122,7 @@ def determine_partition(pset, subset_size):
             sample.append([i, pset.particles[i].xi, pset.particles[i].yi])
         
         # Gather samples
-        messages = [[] for x in size]
+        messages = [[] for x in range(size)]
         for i in range(1, size):
             messages[i] = comm.irecv(source=i)
         
