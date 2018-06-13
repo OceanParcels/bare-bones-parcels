@@ -179,14 +179,16 @@ def determine_partition(pset, subset_size):
                 else:
                     branch = branch["right"]
             else:
-                raise ValueError('Unknown cut direction encoutered')
-        to_send[branch["proc"][0]].append(pset.particles[i])
+                raise ValueError('Unknown cut direction encountered')
+        if branch["proc"][0] != rank:
+            prem = pset.remove(pset.particles[i])
+            prem = prem[0]
+            prem.CGridIndexSetptr = 0
+            to_send[branch["proc"][0]].append(prem)
     
     for i in range(size):
         if i != rank:
             comm.isend(to_send[i], i)
-            for p in to_send[i]:
-                pset.remove(p)
 
     # Receive particles from other processors
     reqs = []
@@ -197,7 +199,10 @@ def determine_partition(pset, subset_size):
     for i in range(size - 1):
         res = reqs[i].wait()
         for p in res:
+            p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
+            p.CGridIndexSet = p.CGridIndexSetptr.value
             pset.add(p)
+    pset.size = len(pset.particles)
     
 def recursive_partition(proc, dict, sub, dir):
     # If the sample is smaller than the number of processors, this has strange results (it will try to partition a single particle)
