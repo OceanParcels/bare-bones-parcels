@@ -185,7 +185,7 @@ def determine_partition(pset, subset_size):
     for i in range(size):
         if i != rank:
             comm.isend(to_send[i], i)
-            for p in to_send:
+            for p in to_send[i]:
                 pset.remove(p)
 
     # Receive particles from other processors
