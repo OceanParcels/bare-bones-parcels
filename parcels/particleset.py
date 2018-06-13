@@ -167,9 +167,9 @@ def recursive_partition(no_proc, dict, sub, dir):
 
     new_dir = 'x'
     cut = -1
-    no_proc_l = ceil(no_proc / 2)
-    no_proc_r = floor(no_proc / 2)
-    no_part_l = ceil(no_proc_l / no_proc * len(sub))
+    no_proc_l = math.ceil(no_proc / 2)
+    no_proc_r = math.floor(no_proc / 2)
+    no_part_l = math.ceil(no_proc_l / no_proc * len(sub))
 
     if dir == 'x':
         new_dir = 'y'
