@@ -109,7 +109,12 @@ def determine_partition(pset, subset_size):
     
     if rank != 0:
         # Sample
-        subset = random.sample(range(len(pset.particles)), subset_size)
+        subset= []
+        if (len(pset.particles) > subset_size):
+            subset = random.sample(range(len(pset.particles)), subset_size)
+        else:
+            subset = range(len(pset.particles))
+        
         # Send sample to processor 0
         psend = []
         for i in subset:
@@ -120,7 +125,12 @@ def determine_partition(pset, subset_size):
         sample = []
         
         # Determine own sample
-        subset = random.sample(range(len(pset.particles)), subset_size)
+        subset= []
+        if (len(pset.particles) > subset_size):
+            subset = random.sample(range(len(pset.particles)), subset_size)
+        else:
+            subset = range(len(pset.particles))
+            
         for i in subset:
             sample.append([i, pset.particles[i].xi, pset.particles[i].yi])
         
@@ -172,8 +182,6 @@ def recursive_partition(no_proc, dict, sub, dir):
     no_proc_l = int(math.ceil(no_proc / 2))
     no_proc_r = int(math.floor(no_proc / 2))
     no_part_l = int(math.ceil(no_proc_l / no_proc * len(sub)))
-
-    print("%d / %d * %d = %d / %d" % (no_proc_l, no_proc, len(sub), math.ceil(no_proc_l / no_proc * len(sub)), no_part_l))
     
     if dir == 'x':
         new_dir = 'y'
