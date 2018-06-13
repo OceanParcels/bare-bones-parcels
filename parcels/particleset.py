@@ -107,7 +107,7 @@ def determine_partition(pset, subset_size):
     
     if rank != 0:
         # Sample
-        subset = random.sample(range(len(pset.particles), subset_size))
+        subset = random.sample(range(len(pset.particles)), subset_size)
         # Send sample to processor 0
         psend = []
         for i in subset:
@@ -117,7 +117,7 @@ def determine_partition(pset, subset_size):
         sample = []
         
         # Determine own sample
-        subset = random.sample(range(len(pset.particles), subset_size))
+        subset = random.sample(range(len(pset.particles)), subset_size)
         for i in subset:
             sample.append([i, pset.particles[i].xi, pset.particles[i].yi])
         
