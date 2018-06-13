@@ -124,7 +124,7 @@ def determine_partition(pset, subset_size):
         # Gather samples
         messages = [[] for x in size]
         for i in range(1, size):
-            comm.irecv(messages[i], source=i)
+            messages[i] = comm.irecv(source=i)
         
         comm.Barrier()
         
@@ -148,7 +148,7 @@ def determine_partition(pset, subset_size):
             comm.isend(partition, i)
     if rank != 0:
         # Recieve cut-information
-        comm.recv(partition, source=0)
+        partition = comm.recv(source=0)
         
     # Send particles to other processors
     # Receive particles from other processors
