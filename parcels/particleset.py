@@ -161,6 +161,7 @@ def determine_partition(pset, subset_size):
     if rank != 0:
         # Recieve cut-information
         partition = comm.recv(source=0)
+        print(partition["cut"])
 
     # Send particles to other processors
     to_send = [[] for x in range(size)]
