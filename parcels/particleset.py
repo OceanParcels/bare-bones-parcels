@@ -114,7 +114,6 @@ def determine_partition(pset, subset_size):
             psend.append([i, pset.particles[i].xi, pset.particles[i].yi])
         comm.isend(psend, 0)
         print(str(rank) + " sent:" + str(psend))
-        comm.Barrier()
     if rank == 0:
         sample = []
         
@@ -129,7 +128,9 @@ def determine_partition(pset, subset_size):
             messages[i] = comm.irecv(source=i)
             print("Waiting for: " + str(i))
         
-        comm.Barrier()
+        for i in range(1, size):
+            messages[i].Wait()
+            print("Completed waiting for: " + str(i))
         
         for i in range(1, size):
             sample += messages[i]
