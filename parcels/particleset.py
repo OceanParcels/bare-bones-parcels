@@ -145,7 +145,9 @@ def determine_partition(pset, subset_size):
         for i in range(size - 1):
             sample += messages[i]
         
-        # Assign all particles a unique id
+        print(len(sample))
+        
+        # Assign all particles a unique id -- This is probably not necessary
         for i in range(len(sample)):
             sample[i][0] = i
         
