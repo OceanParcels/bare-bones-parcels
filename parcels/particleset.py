@@ -163,7 +163,7 @@ def determine_partition(pset, subset_size):
         partition = comm.recv(source=0)
         print(partition)
     # Send particles to other processors
-    for i in range(pset.particles):
+    for i in range(len(pset.particles)):
         return
     # Receive particles from other processors
     
