@@ -182,7 +182,6 @@ def determine_partition(pset, subset_size):
                 raise ValueError('Unknown cut direction encountered')
         if branch["proc"][0] != rank:
             prem = pset.remove(i)
-            prem = prem[0]
             prem.CGridIndexSetptr = 0
             to_send[branch["proc"][0]].append(prem)
     
@@ -268,9 +267,9 @@ subset_size = 1 # placeholder value
 for iter in range(17):
     #if rank == 0:
     if iter % 5 == 0:
-        print("Before: " + str(pset.particles))
+        print("Before (" + rank + "): " + str(pset.particles))
         determine_partition(pset, subset_size)
-        print("After: " + str(pset.particles))
+        print("After (" + rank + "): " + str(pset.particles))
     print('ITER %d' % iter)
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
     function(c_int(pset.size), particle_data)
