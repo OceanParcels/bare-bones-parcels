@@ -195,6 +195,7 @@ def determine_partition(pset, subset_size):
     for i in range(len(prem)):
         prem[i].CGridIndexSetptr = 0
         to_send[procs[i]].append(prem[i])
+        print("Removed particle and sent to proc " + str(procs[i]))
     
     for i in range(size):
         if i != rank:
@@ -212,6 +213,7 @@ def determine_partition(pset, subset_size):
             p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
             p.CGridIndexSet = p.CGridIndexSetptr.value
             pset.add(p)
+            print("Added particle sent by proc " + str(i))
     pset.size = len(pset.particles)
     
 def recursive_partition(proc, sub, dir):
