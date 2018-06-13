@@ -123,17 +123,18 @@ def determine_partition(pset, subset_size):
             sample.append([i, pset.particles[i].xi, pset.particles[i].yi])
         
         # Gather samples
-        messages = [[] for x in range(size)]
-        req = [[] for x in range(size)]
+        messages = []
         for i in range(1, size):
-            messages[i] = comm.irecv(source=i)
+            messages.append(comm.irecv(source=i))
             print("Waiting for: " + str(i))
+        
+        print(str(messages))
         
         MPI.Request.Waitall(messages, MPI.Status())
         
         print(str(messages))
         
-        for i in range(1, size):
+        for i in range(size - 1):
             sample += messages[i]
         
         # Assign all particles a unique id
