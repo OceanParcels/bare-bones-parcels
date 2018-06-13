@@ -128,14 +128,14 @@ def determine_partition(pset, subset_size):
             messages.append(comm.irecv(source=i))
             print("Waiting for: " + str(i))
         
-        print(str(messages))
-        
-        MPI.Request.Waitall(messages, MPI.Status())
+        MPI.Request.Waitall(messages)
         
         print(str(messages))
         
         for i in range(size - 1):
-            sample += messages[i]
+            sample += messages[i][1]
+        
+        print(str(sample))
         
         # Assign all particles a unique id
         for i in range(len(sample)):
