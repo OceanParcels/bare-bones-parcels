@@ -256,19 +256,19 @@ def determine_area(partition, region):
     if len(partition["proc"]) == 1:
         return { partition["proc"][0]: region }
     if partition["dir"] == 'x':
-        left_region = region
+        left_region = list(region)
         left_region[1] = partition["cut"]
         left_res = determine_area(partition["left"], left_region)
-        right_region = region
+        right_region = list(region)
         right_region[0] = partition["cut"]
         right_res = determine_area(partition["right"], right_region)
         left_res.update(right_res)
         return left_res
     elif partition["dir"] == 'y':
-        left_region = region
+        left_region = list(region)
         left_region[3] = partition["cut"]
         left_res = determine_area(partition["left"], left_region)
-        right_region = region
+        right_region = list(region)
         right_region[2] = partition["cut"]
         right_res = determine_area(partition["right"], right_region)
         left_res.update(right_res)
