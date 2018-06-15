@@ -255,7 +255,7 @@ def recursive_partition(proc, sub, dir):
 def determine_area(partition, region):
     if len(partition["proc"] == 1):
         return { partition["proc"][0]: region }
-    if partition["dir"] = 'x':
+    if partition["dir"] == 'x':
         left_region = region
         left_region[1] = partition["cut"]
         left_res = determine_area(partition["left"], left_region)
@@ -264,7 +264,7 @@ def determine_area(partition, region):
         right_res = determine_area(partition["right"], right_region)
         left_res.update(right_res)
         return left_res
-    elif partition["dir"] = 'y':
+    elif partition["dir"] == 'y':
         left_region = region
         left_region[3] = partition["cut"]
         left_res = determine_area(partition["left"], left_region)
