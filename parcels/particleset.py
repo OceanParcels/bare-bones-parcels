@@ -277,8 +277,8 @@ def determine_area(partition, region):
         raise ValueError('A cut in a unknown dimension was encountered.')
 
 
-lons = [1, 3, 4, 8, 10]
-lats = [2, 3, 4, 5, 6]
+lons = [1, 2, 3, 4, 7, 8, 10]
+lats = [2, 3, 3, 4, 5, 6, 8]
 
 pset = ParticleSet(lons, lats)
 
@@ -302,7 +302,7 @@ function = lib.mainFunc
 
 
 # Initial particle distribution
-subset_size = 1 # placeholder value
+subset_size = 3 # placeholder value
 area = [float('-inf'), float('inf'), float('-inf'), float('inf')]
 #determine_partition(pset, subset_size)
 
