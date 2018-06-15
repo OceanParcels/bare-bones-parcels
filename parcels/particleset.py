@@ -155,7 +155,6 @@ def determine_partition(pset, subset_size):
             # The cut is defined as \leq, so if dir = x and cut = 4, to the left are all particles with x <= 4.
         
         # Determine areas of responsibility
-        print(partition)
         areas = determine_area(partition, area)
         area = areas[0]
         
@@ -254,7 +253,7 @@ def recursive_partition(proc, sub, dir):
 
 
 def determine_area(partition, region):
-    if len(partition["proc"] == 1):
+    if len(partition["proc"]) == 1:
         return { partition["proc"][0]: region }
     if partition["dir"] == 'x':
         left_region = region
