@@ -155,6 +155,7 @@ def determine_partition(pset, subset_size):
             # The cut is defined as \leq, so if dir = x and cut = 4, to the left are all particles with x <= 4.
         
         # Determine areas of responsibility
+        print(partition)
         areas = determine_area(partition, area)
         area = areas[0]
         
