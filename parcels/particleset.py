@@ -72,7 +72,7 @@ class ParticleSet(object):
         return particles
 
 
-    def check_particles(self):
+    def check_particles(self, area):
         comm = MPI.COMM_WORLD
         rank = comm.Get_rank()
         size = comm.Get_size()
@@ -80,15 +80,16 @@ class ParticleSet(object):
         toRem = []
         for i in range(len(self.particles)):
             p = self.particles[i]
-            if (rank == 0 and p.xi > 5) or (rank == 1 and p.xi < 6):
+            if p.xi <= area[0] or p.xi > area[1] or p.yi <= area[2] or p.yi > area[3]:
                 toRem.append(i)
         if len(toRem) > 0:
             prem = self.remove(toRem)
+            # TODO: split prem according to the processors to which they have to be sent
             for p in prem:
                 p.CGridIndexSetptr = 0
-            comm.isend(prem, (rank+1)%2, 17)
+            comm.isend(prem, (rank+1)%2)
             print 'p sent'
-        req2 = comm.irecv(source=(rank+1)%2, tag=17)
+        req2 = comm.irecv(source=(rank+1)%2)
         comm.Barrier()
         p2 = req2.test()
         if not p2[0]:
@@ -107,6 +108,7 @@ def determine_partition(pset, subset_size):
     rank = comm.Get_rank()
     size = comm.Get_size()
     partition = []
+    area = [float(-inf), float(inf), float(-inf), float(inf)]
     
     if rank != 0:
         # Sample
@@ -152,12 +154,18 @@ def determine_partition(pset, subset_size):
             # Our first cut will result in floor(p/2)/p particles to be on one side, and ceil(p/2)/p particles on the other. Recurse with p1 = floor(p/2) and p2 = ceil(p/1) until px = 1.
             # The cut is defined as \leq, so if dir = x and cut = 4, to the left are all particles with x <= 4.
         
+        # Determine areas of responsibility
+        areas = determine_area(partition, area)
+        area = areas[0]
+        
         # Communicate cuts
         for i in range(1, size):
             comm.isend(partition, i)
+            comm.isend(areas[i], i)
     if rank != 0:
-        # Recieve cut-information
+        # Recieve cut-information, relies on MPI messages to be order-preserving
         partition = comm.recv(source=0)
+        area = comm.recv(source=0)
 
     # Send particles to other processors
     to_send = [[] for x in range(size)]
@@ -208,6 +216,9 @@ def determine_partition(pset, subset_size):
             pset.add(p)
     pset.size = len(pset.particles)
     
+    print("Area of processor " + str(rank) + ": " + str(area))
+    return area
+    
 def recursive_partition(proc, sub, dir):
     # If the sample is smaller than the number of processors, this has strange results (it will try to partition a single particle)
     # Base case
@@ -239,7 +250,32 @@ def recursive_partition(proc, sub, dir):
     right_partition = recursive_partition(proc_r, sub_r, new_dir)
 
     return {"dir": dir, "cut": cut, "left": left_partition, "right": right_partition, "proc": proc}
-    
+
+
+def determine_area(partition, region):
+    if len(partition["proc"] == 1):
+        return { partition["proc"][0]: region }
+    if partition["dir"] = 'x':
+        left_region = region
+        left_region[1] = partition["cut"]
+        left_res = determine_area(partition["left"], left_region)
+        right_region = region
+        right_region[0] = partition["cut"]
+        right_res = determine_area(partition["right"], right_region)
+        left_res.update(right_res)
+        return left_res
+    elif partition["dir"] = 'y':
+        left_region = region
+        left_region[3] = partition["cut"]
+        left_res = determine_area(partition["left"], left_region)
+        right_region = region
+        right_region[2] = partition["cut"]
+        right_res = determine_area(partition["right"], right_region)
+        left_res.update(right_res)
+        return left_res
+    else:
+        raise ValueError('A cut in a unknown dimension was encountered.')
+
 
 lons = [1, 3, 4, 8, 10]
 lats = [2, 3, 4, 5, 6]
@@ -267,16 +303,17 @@ function = lib.mainFunc
 
 # Initial particle distribution
 subset_size = 1 # placeholder value
+area = [float(-inf), float(inf), float(-inf), float(inf)]
 #determine_partition(pset, subset_size)
 
 for iter in range(17):
     #if rank == 0:
     if iter % 5 == 0:
-        determine_partition(pset, subset_size)
+        area = determine_partition(pset, subset_size)
     print('ITER %d' % iter)
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
     function(c_int(pset.size), particle_data)
-    pset.check_particles()
+    pset.check_particles(area)
     time.sleep(.5)
 
 time.sleep(200)
