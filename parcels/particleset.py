@@ -108,7 +108,7 @@ def determine_partition(pset, subset_size):
     rank = comm.Get_rank()
     size = comm.Get_size()
     partition = []
-    area = [float(-inf), float(inf), float(-inf), float(inf)]
+    area = [float('-inf'), float('inf'), float('-inf'), float('inf')]
     
     if rank != 0:
         # Sample
@@ -303,7 +303,7 @@ function = lib.mainFunc
 
 # Initial particle distribution
 subset_size = 1 # placeholder value
-area = [float(-inf), float(inf), float(-inf), float(inf)]
+area = [float('-inf'), float('inf'), float('-inf'), float('inf')]
 #determine_partition(pset, subset_size)
 
 for iter in range(17):
