@@ -25,7 +25,7 @@ def code_generate(pset, src_file, lib_file, log_file):
     ccode += 'for(i=0;i<n;++i){\n'
     ccode += '  JITParticle* p = &pset[i];\n'
     ccode += '  p->xi += 1;\n'
-    ccode += '  if (p->xi > 15)\n'
+    ccode += '  if (p->xi > 115)\n'
     ccode += '    p->xi = 0;\n'
     ccode += '  printf("rank:%d P[%d %d %d]: (%d, %d)\\n", rank, i, p->rank0, p->id, p->xi, p->yi);\n'
     ccode += '}\n'
