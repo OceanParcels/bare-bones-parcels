@@ -315,6 +315,8 @@ print(str(len(lons)))
 
 pset = ParticleSet(lons, lats)
 print(str(len(pset.particles)))
+print(str(pset.particles[0].xi))
+print(str(pset.particles[15].xi))
 
 src_file = 'c_code.c'
 lib_file = 'c_code.so'
