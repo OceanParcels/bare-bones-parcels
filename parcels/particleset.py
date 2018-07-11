@@ -305,8 +305,9 @@ def determine_area(partition, region):
         raise ValueError('A cut in a unknown dimension was encountered.')
 
 
-lons = [1, 2, 3, 4, 7, 8, 10]
-lats = [2, 3, 3, 4, 5, 6, 8]
+# Note that this is a non-repating list of random number now
+lons = random.sample(range(0, 100), 50) #[1, 2, 3, 4, 7, 8, 10]
+lats = random.sample(range(0, 100), 50) #[2, 3, 3, 4, 5, 6, 8]
 
 pset = ParticleSet(lons, lats)
 
