@@ -39,7 +39,7 @@ class ParticleSet(object):
         
         last_particle = (rank + 1) * particles_per_processor + remainder
         if rank + 1 < remainder:
-            last_particle -= remainder - rank + 1
+            last_particle -= remainder - (rank + 1)
 
         for i in range(first_particle, last_particle):
             self.particles[i - first_particle] = JITParticle(lons[i], lats[i], 0, cptr=cptr(i - first_particle))
