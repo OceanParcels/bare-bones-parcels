@@ -26,6 +26,7 @@ class ParticleSet(object):
             self.size = particles_per_processor
         self.particles = np.empty(self.size, dtype=JITParticle)
         self.ptype = JITParticle.getPType()
+        self.partition = []
         dtype = self.ptype.dtype
         self._particle_data = np.empty(self.size, dtype=dtype)
 
@@ -82,24 +83,49 @@ class ParticleSet(object):
             p = self.particles[i]
             if p.xi <= area[0] or p.xi > area[1] or p.yi <= area[2] or p.yi > area[3]:
                 toRem.append(i)
-        if len(toRem) > 0:
-            prem = self.remove(toRem)
-            # TODO: split prem according to the processors to which they have to be sent
-            for p in prem:
-                p.CGridIndexSetptr = 0
-            comm.isend(prem, (rank+1)%2)
-            print 'p sent'
-        req2 = comm.irecv(source=(rank+1)%2)
-        comm.Barrier()
-        p2 = req2.test()
-        if not p2[0]:
-            req2.Cancel()
-        else:
-            p = p2[1]
-            for padd in p:
-                padd.CGridIndexSetptr = cast(pointer(padd.gridIndexSet.ctypes_struct), c_void_p)
-                padd.CGridIndexSet = padd.CGridIndexSetptr.value
-                self.add(padd)
+        # No conditional, we expect a message from every processor.
+        #if len(toRem) > 0:
+        prem = self.remove(toRem)
+        
+        # Split prem according to the processors to which they have to be sent
+        to_send = [[] for x in range(size)]
+        
+        for i in range(len(prem)):
+            branch = self.partition
+            while branch["dir"] != 'l':
+                if branch["dir"] == 'x':
+                    if prem[i].xi <= branch["cut"]:
+                        branch = branch["left"]
+                    else:
+                        branch = branch["right"]
+                elif branch["dir"] == 'y':
+                    if prem[i].yi <= branch["cut"]:
+                        branch = branch["left"]
+                    else:
+                        branch = branch["right"]
+                else:
+                    raise ValueError('Unknown cut direction encountered')
+            prem[i].CGridIndexSetptr = 0
+            to_send[branch["proc"][0]].append(prem[i])
+        
+        for i in range(size):
+            if i != rank:
+                comm.isend(to_send[i], i)
+        
+        print('%i particles sent' % (len(prem)))
+
+        # Receive particles from other processors
+        reqs = []
+        for i in range(size):
+            if i != rank:
+                reqs.append(comm.irecv(source=i))
+        
+        for i in range(size - 1):
+            res = reqs[i].wait()
+            for p in res:
+                p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
+                p.CGridIndexSet = p.CGridIndexSetptr.value
+                self.add(p)
         self.size = len(self.particles)
 
 
@@ -167,6 +193,8 @@ def determine_partition(pset, subset_size):
         partition = comm.recv(source=0)
         area = comm.recv(source=0)
 
+    self.partition = partition
+    
     # Send particles to other processors
     to_send = [[] for x in range(size)]
     indices = []
