@@ -309,14 +309,8 @@ def determine_area(partition, region):
 random.seed(123)
 lons = random.sample(range(0, 100), 50) #[1, 2, 3, 4, 7, 8, 10]
 lats = random.sample(range(0, 100), 50) #[2, 3, 3, 4, 5, 6, 8]
-print(lons)
-print(lats)
-print(str(len(lons)))
 
 pset = ParticleSet(lons, lats)
-print(str(len(pset.particles)))
-print(str(pset.particles[0].xi))
-print(str(pset.particles[15].xi))
 
 src_file = 'c_code.c'
 lib_file = 'c_code.so'
