@@ -337,9 +337,9 @@ area = [float('-inf'), float('inf'), float('-inf'), float('inf')]
 for iter in range(17):
     #if rank == 0:
     if iter % 5 == 0:
-        time = time.time()
+        time1 = time.time()
         area = determine_partition(pset, subset_size)
-        print('Processor %i: getting area took: %2f seconds' % (rank, time.time() - time))
+        print('Processor %i: getting area took: %2f seconds' % (rank, time.time() - time1))
     print('ITER %d' % iter)
     time2 = time.time()
     particle_data = pset._particle_data.ctypes.data_as(c_void_p)
