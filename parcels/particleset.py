@@ -193,7 +193,7 @@ def determine_partition(pset, subset_size):
         partition = comm.recv(source=0)
         area = comm.recv(source=0)
 
-    self.partition = partition
+    pset.partition = partition
     
     # Send particles to other processors
     to_send = [[] for x in range(size)]
