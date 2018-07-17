@@ -307,8 +307,8 @@ def determine_area(partition, region):
 
 # Note that this is a non-repating list of random number now
 random.seed(123)
-lons = random.sample(range(0, 100), 50) #[1, 2, 3, 4, 7, 8, 10]
-lats = random.sample(range(0, 100), 50) #[2, 3, 3, 4, 5, 6, 8]
+lons = [random.randint(0,100) for x in range(2000)] #[1, 2, 3, 4, 7, 8, 10]
+lats = [random.randint(0,100) for x in range(2000)] #[2, 3, 3, 4, 5, 6, 8]
 
 pset = ParticleSet(lons, lats)
 
