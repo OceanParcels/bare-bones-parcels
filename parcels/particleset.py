@@ -138,7 +138,7 @@ def determine_partition(pset, subset_size):
     
     if rank != 0:
         # Sample
-        subset= []
+        subset = []
         if (len(pset.particles) > subset_size):
             subset = random.sample(range(len(pset.particles)), subset_size)
         else:
@@ -148,7 +148,7 @@ def determine_partition(pset, subset_size):
         psend = []
         for i in subset:
             psend.append([pset.particles[i].xi, pset.particles[i].yi])
-        comm.isend(psend, 0)
+        comm.Isend(np.array(psend), dest=0, tag=2)
     if rank == 0:
         sample = []
         
@@ -162,17 +162,28 @@ def determine_partition(pset, subset_size):
         for i in subset:
             sample.append([pset.particles[i].xi, pset.particles[i].yi])
         
+        sample = np.array(sample)
         # Gather samples
-        messages = []
-        reqs = []
-        for i in range(1, size):
-            reqs.append(comm.irecv(source=i))
+        #messages = []
+        #reqs = []
         
         for i in range(1, size):
-            messages.append(reqs[i - 1].wait())
+            info = MPI.Status()
+            comm.Probe(MPI.ANY_SOURCE, MPI.ANY_TAG, info)
+            count = info.Get_elements(MPI.INT)
+            row_length = info.Get_tag()
+            data = np.empty((int(math.ceil(count / row_length)), row_length), dtype = np.int)
+            comm.Recv(data, MPI.ANY_SOURCE, MPI.ANY_TAG, info)
+            sample = np.concatenate(sample, data)
         
-        for i in range(size - 1):
-            sample += messages[i]
+        #for i in range(1, size):
+        #    reqs.append(comm.irecv(source=i))
+        
+        #for i in range(1, size):
+        #    messages.append(reqs[i - 1].wait())
+        
+        #for i in range(size - 1):
+        #    sample += messages[i]
         
         # Start recursive paritioning
         partition = recursive_partition(range(size), sample, 'x')
