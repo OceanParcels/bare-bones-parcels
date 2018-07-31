@@ -148,7 +148,7 @@ def determine_partition(pset, subset_size):
         psend = []
         for i in subset:
             psend.append([pset.particles[i].xi, pset.particles[i].yi])
-        comm.Isend(np.array(psend), dest=0, tag=2)
+        comm.Isend(np.array(psend, dtype=np.int), dest=0, tag=2)
     if rank == 0:
         sample = []
         
@@ -162,7 +162,7 @@ def determine_partition(pset, subset_size):
         for i in subset:
             sample.append([pset.particles[i].xi, pset.particles[i].yi])
         
-        sample = np.array(sample)
+        sample = np.array(sample, dtype=np.int)
         # Gather samples
         #messages = []
         #reqs = []
