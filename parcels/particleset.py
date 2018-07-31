@@ -174,7 +174,7 @@ def determine_partition(pset, subset_size):
             row_length = info.Get_tag()
             data = np.empty((int(math.ceil(count / row_length)), row_length), dtype = np.int)
             comm.Recv(data, MPI.ANY_SOURCE, MPI.ANY_TAG, info)
-            sample = np.concatenate(sample, data)
+            sample = np.concatenate((sample, data), axis=0)
         
         #for i in range(1, size):
         #    reqs.append(comm.irecv(source=i))
