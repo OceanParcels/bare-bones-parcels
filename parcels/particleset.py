@@ -273,11 +273,11 @@ def recursive_partition(proc, sub, dir):
     if dir == 'x':
         new_dir = 'y'
         # Cut in the x-direction
-        sub.sort(key = lambda x: x[0])
+        sub = sub[sub[:,0].argsort()]
         cut = sub[no_part_l - 1][0]
     elif dir == 'y':
         # Cut in the y-direction
-        sub.sort(key = lambda x: x[1])
+        sub = sub[sub[:,1].argsort()]
         cut = sub[no_part_l - 1][1]
     else:
         raise ValueError('A cut in a unknown dimension was requested during partitioning.')
