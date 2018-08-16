@@ -242,13 +242,21 @@ def determine_partition(pset, subset_size):
             comm.isend(to_send[i], i)
 
     # Receive particles from other processors
-    reqs = []
-    for i in range(size):
-        if i != rank:
-            reqs.append(comm.irecv(source=i))
+    #reqs = []
+    #for i in range(size):
+    #    if i != rank:
+    #        reqs.append(comm.irecv(source=i))
+    
+    #for i in range(size - 1):
+    #    res = reqs[i].wait()
+    #    for p in res:
+    #        p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
+    #        p.CGridIndexSet = p.CGridIndexSetptr.value
+    #        pset.add(p)
+    #pset.size = len(pset.particles)
     
     for i in range(size - 1):
-        res = reqs[i].wait()
+        res = comm.recv(MPI.ANY_SOURCE, MPI.ANY_TAG)
         for p in res:
             p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
             p.CGridIndexSet = p.CGridIndexSetptr.value
