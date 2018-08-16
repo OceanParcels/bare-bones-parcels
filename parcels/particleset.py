@@ -237,9 +237,12 @@ def determine_partition(pset, subset_size):
         prem[i].CGridIndexSetptr = 0
         to_send[procs[i]].append(prem[i])
     
+    requests = []
+    
     for i in range(size):
         if i != rank:
-            comm.isend(to_send[i], dest=i, tag=0)
+            req = comm.isend(to_send[i], dest=i, tag=0)
+            requests.append(req)
 
     # Receive particles from other processors
     #reqs = []
@@ -262,6 +265,8 @@ def determine_partition(pset, subset_size):
             p.CGridIndexSet = p.CGridIndexSetptr.value
             pset.add(p)
     pset.size = len(pset.particles)
+    
+    MPI.Request.Waitall(requests)
     
     print("Area of processor " + str(rank) + ": " + str(area))
     return area
