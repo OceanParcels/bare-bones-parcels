@@ -108,25 +108,37 @@ class ParticleSet(object):
             prem[i].CGridIndexSetptr = 0
             to_send[branch["proc"][0]].append(prem[i])
         
+        reqs = []
+        
         for i in range(size):
             if i != rank:
-                comm.isend(to_send[i], i)
+                reqs.append(comm.isend(to_send[i], dest=i, tag=0))
         
         print('%i particles sent' % (len(prem)))
 
         # Receive particles from other processors
-        reqs = []
-        for i in range(size):
-            if i != rank:
-                reqs.append(comm.irecv(source=i))
+        #reqs = []
+        #for i in range(size):
+        #    if i != rank:
+        #        reqs.append(comm.irecv(source=i))
+        
+        #for i in range(size - 1):
+        #    res = reqs[i].wait()
+        #    for p in res:
+        #        p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
+        #        p.CGridIndexSet = p.CGridIndexSetptr.value
+        #        self.add(p)
+        #self.size = len(self.particles)
         
         for i in range(size - 1):
-            res = reqs[i].wait()
+            res = comm.recv(source=MPI.ANY_SOURCE, tag=MPI.ANY_TAG)
             for p in res:
                 p.CGridIndexSetptr = cast(pointer(p.gridIndexSet.ctypes_struct), c_void_p)
                 p.CGridIndexSet = p.CGridIndexSetptr.value
-                self.add(p)
-        self.size = len(self.particles)
+                pset.add(p)
+        pset.size = len(pset.particles)
+        
+        MPI.Request.Waitall(reqs)
 
 
 def determine_partition(pset, subset_size):
@@ -237,12 +249,11 @@ def determine_partition(pset, subset_size):
         prem[i].CGridIndexSetptr = 0
         to_send[procs[i]].append(prem[i])
     
-    requests = []
+    reqs = []
     
     for i in range(size):
         if i != rank:
-            req = comm.isend(to_send[i], dest=i, tag=0)
-            requests.append(req)
+            reqs.append(comm.isend(to_send[i], dest=i, tag=0))
 
     # Receive particles from other processors
     #reqs = []
@@ -266,7 +277,7 @@ def determine_partition(pset, subset_size):
             pset.add(p)
     pset.size = len(pset.particles)
     
-    MPI.Request.Waitall(requests)
+    MPI.Request.Waitall(reqs)
     
     print("Area of processor " + str(rank) + ": " + str(area))
     return area
