@@ -76,7 +76,7 @@ class ParticleSet(object):
             prem = prem[0]
             prem.CGridIndexSetptr = 0
             comm.isend(prem, (rank+1)%2, 17)
-            print 'p sent'
+            print('p sent')
         req2 = comm.irecv(source=(rank+1)%2, tag=17)
         comm.Barrier()
         p2 = req2.test()
@@ -106,6 +106,7 @@ if rank == 0:
     print("Compiled %s ==> %s\n" % (src_file, lib_file))
 comm.Barrier()
 
+
 import numpy.ctypeslib as npct
 lib = npct.load_library(lib_file, '.')
 function = lib.mainFunc
@@ -119,4 +120,4 @@ for iter in range(17):
     pset.check_particles()
     time.sleep(.5)
 
-time.sleep(200)
+#time.sleep(200)

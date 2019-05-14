@@ -13,7 +13,7 @@ class Compiler(object):
     :arg ldargs: A list of arguments to the linker (optional)."""
 
     def __init__(self, cc, ld=None, cppargs=[], ldargs=[]):
-        self._cc = environ.get('CC', cc)
+        self._cc = os.getenv('CC') if cc is None else cc
         self._ld = environ.get('LDSHARED', ld)
         self._cppargs = cppargs
         self._ldargs = ldargs
