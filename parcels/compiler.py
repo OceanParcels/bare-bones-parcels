@@ -14,7 +14,7 @@ class Compiler(object):
 
     def __init__(self, cc, ld=None, cppargs=[], ldargs=[]):
         self._cc = os.getenv('CC') if cc is None else cc
-        self._ld = environ.get('LDSHARED', ld)
+        #self._ld = environ.get('LDSHARED', ld)
         self._cppargs = cppargs
         self._ldargs = ldargs
 
