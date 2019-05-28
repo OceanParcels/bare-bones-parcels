@@ -1,0 +1,9 @@
+name: rtree_search
+channels:
+  - defaults
+  - fbriol
+dependencies:
+  - xarray
+  - netcdf4
+  - jupyter
+  - pyindex
